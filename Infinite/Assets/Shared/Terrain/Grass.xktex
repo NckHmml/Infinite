@@ -1,0 +1,7 @@
+!Texture
+Id: 21e748df-c666-4bbb-9a15-493f9190ca20
+SerializedVersion: {Xenko: 1.4.0-beta}
+Tags: []
+Source: ../../Textures/Grass.png
+ColorKeyColor: {R: 255, G: 0, B: 255, A: 255}
+Format: AsIs

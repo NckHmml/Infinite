@@ -1,0 +1,44 @@
+!Package
+Id: 81695688-7f48-4034-a7b5-2e54116a6fac
+SerializedVersion: {Assets: 0.0.4}
+Meta:
+    Name: Infinite
+    Version: 1.0.0.0
+    Authors: []
+    Owners: []
+    RootNamespace: Infinite
+    Dependencies:
+        -   Name: Xenko
+            Version: 1.9.3-beta
+            RootAssets: []
+LocalDependencies: []
+Profiles:
+    -   Name: Shared
+        Platform: Shared
+        InheritProfiles: []
+        AssetFolders:
+            -   Path: Assets/Shared
+            -   Path: Infinite.Game/Effects
+        OutputGroupDirectories: {}
+        ProjectReferences:
+            -   Id: 3f37a14e-a942-4d38-a087-d131a310ea2c
+                Location: Infinite.Game/Infinite.Game.csproj
+                Type: Library
+    -   Name: Windows
+        Platform: Windows
+        InheritProfiles: []
+        AssetFolders:
+            -   Path: Assets/Windows
+        OutputGroupDirectories: {}
+        ProjectReferences:
+            -   Id: 72c5257c-f7a3-48cc-9dbe-fd4f560163bf
+                Location: Infinite.Windows/Infinite.Windows.csproj
+                Type: Executable
+ExplicitFolders: []
+Bundles: []
+TemplateFolders: []
+RootAssets:
+    - 21e748df-c666-4bbb-9a15-493f9190ca20:Terrain/Grass
+    - 7f66f368-da34-49ba-9876-dfd011fc9c1b:Terrain/Stone
+    - abfc4397-72aa-465f-902e-796685c372d3:Terrain/Soil
+    - c3a8ee37-5f38-4616-847d-8df9ecbc382d:Skybox Texture
