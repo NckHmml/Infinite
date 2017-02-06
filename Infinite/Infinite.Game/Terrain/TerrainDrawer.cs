@@ -13,9 +13,9 @@ namespace Infinite.Terrain
 {
     public class TerrainDrawer
     {
-        private Dictionary<TerrainTexture, HashSet<int>> PlaneMap { get; } = new Dictionary<TerrainTexture, HashSet<int>>();
+        private HashSet<int> PlaneMap { get; } = new HashSet<int>();
         private Dictionary<int, TerrainPlane> Planes { get; } = new Dictionary<int, TerrainPlane>();
-        private Dictionary<TerrainTexture, VertexBufferBinding> VertexBuffers { get; } = new Dictionary<TerrainTexture, VertexBufferBinding>();
+        private VertexBufferBinding? VertexBuffer { get; set; }
 
         private const int PlaneStep = 1000;
         private int PlaneCount = 0;
@@ -43,8 +43,8 @@ namespace Infinite.Terrain
             int count = planes?.Count() ?? 0;
             count = count - count % PlaneStep;
             count += PlaneStep;
-            InitialAddPlanes(planes);
             CreateIndices(device, count);
+            InitialAddPlanes(planes);
         }
 
         public void AddPlane(TerrainPlane plane)
@@ -52,39 +52,34 @@ namespace Infinite.Terrain
             lock (PlaneLock)
             {
                 TerrainTexture key = plane.Texture;
-                EnsureCapacity(key);
-                SetVertices(plane, PlaneMap[key].Count);
-
-                if (!PlaneMap.ContainsKey(key))
-                    PlaneMap.Add(key, new HashSet<int>());
-                PlaneMap[key].Add(PlaneCount);
-
+                EnsureCapacity();
+                SetVertices(plane, PlaneMap.Count);
+                                
+                PlaneMap.Add(PlaneCount);
                 Planes.Add(PlaneCount, plane);
+
                 PlaneCount++;
             }
         }
 
-        public IEnumerable<Entity> CreateEntities()
+        public Entity CreateEntity()
         {
-            foreach (TerrainTexture textureKey in PlaneMap.Keys)
+            var model = new Model();
+            model.Add(new Mesh
             {
-                var model = new Model();
-                model.Add(new Mesh
+                Draw = new MeshDraw
                 {
-                    Draw = new MeshDraw
-                    {
-                        PrimitiveType = PrimitiveType.TriangleList,
-                        VertexBuffers = new[] { VertexBuffers[textureKey] },
-                        IndexBuffer = new IndexBufferBinding(Indices, true, Indices.ElementCount),
-                        DrawCount = PlaneMap[textureKey].Count * 6
-                    },
-                });
-                model.Meshes[0].Parameters.Set(GameParameters.EnableColorEffect, true);
+                    PrimitiveType = PrimitiveType.TriangleList,
+                    VertexBuffers = new[] { VertexBuffer.Value },
+                    IndexBuffer = new IndexBufferBinding(Indices, true, Indices.ElementCount),
+                    DrawCount = PlaneMap.Count * 6
+                },
+            });
+            model.Meshes[0].Parameters.Set(GameParameters.EnableColorEffect, true);
 
-                var entity = new Entity();
-                entity.Add(new ModelComponent(model));
-                yield return entity;
-            }
+            var entity = new Entity();
+            entity.Add(new ModelComponent(model));
+            return entity;
         }
 
         private void InitialAddPlanes(IEnumerable<TerrainPlane> planes)
@@ -93,30 +88,22 @@ namespace Infinite.Terrain
             {
                 foreach (TerrainPlane plane in planes)
                 {
-                    TerrainTexture key = plane.Texture;
-                    if (!PlaneMap.ContainsKey(key))
-                        PlaneMap.Add(key, new HashSet<int>());
-                    PlaneMap[key].Add(PlaneCount);
-
+                    PlaneMap.Add(PlaneCount);
                     Planes.Add(PlaneCount, plane);
                     PlaneCount++;
                 }
+                
+                int index = 0;
+                int count = PlaneMap.Count;
+                count = count - count % PlaneStep;
+                count += PlaneStep;
 
-                int count;
-                foreach (TerrainTexture key in PlaneMap.Keys)
+                EnsureCapacity(count);
+
+                foreach (int planeKey in PlaneMap)
                 {
-                    count = PlaneMap[key].Count;
-                    count = count - count % PlaneStep;
-                    count += PlaneStep;
-
-                    EnsureCapacity(key, count);
-
-                    int index = 0;
-                    foreach (int planeKey in PlaneMap[key])
-                    {
-                        TerrainPlane plane = Planes[planeKey];
-                        SetVertices(plane, index++);
-                    }
+                    TerrainPlane plane = Planes[planeKey];
+                    SetVertices(plane, index++);
                 }
             }
         }
@@ -142,7 +129,7 @@ namespace Infinite.Terrain
         private unsafe void SetVertices(TerrainPlane plane, int offset)
         {
             TerrainTexture key = plane.Texture;
-            Buffer vertices = VertexBuffers[key].Buffer;
+            Buffer vertices = VertexBuffer?.Buffer;
 
             MappedResource map = Context.CommandList.MapSubresource(vertices, 0, MapMode.WriteNoOverwrite);
             var pointer = (TerrainVertex*)map.DataBox.DataPointer;
@@ -247,30 +234,28 @@ namespace Infinite.Terrain
             Context.CommandList.UnmapSubresource(map);
         }
 
-        private void EnsureCapacity(TerrainTexture key, int step = PlaneStep)
+        private void EnsureCapacity(int step = PlaneStep)
         {
-            if (!VertexBuffers.ContainsKey(key))
+            if (!VertexBuffer.HasValue)
             {
                 int size = TerrainVertex.Layout.CalculateSize() * step * 4;
                 var vertices = Vertex.New(Context.CommandList.GraphicsDevice, size, GraphicsResourceUsage.Dynamic);
-                var binding = new VertexBufferBinding(vertices, TerrainVertex.Layout, vertices.ElementCount);
-                VertexBuffers.Add(key, binding);
+                VertexBuffer = new VertexBufferBinding(vertices, TerrainVertex.Layout, vertices.ElementCount);
             }
             else
             {
-                var binding = VertexBuffers[key];
-                int planeCount = PlaneMap[key].Count;
-                int verticesCount = binding.Buffer.SizeInBytes / VertexSize;
+                var buffer = VertexBuffer?.Buffer;
+                int planeCount = PlaneMap.Count;
+                int verticesCount = buffer.SizeInBytes / VertexSize;
                 int indicesCount = Indices.SizeInBytes / 2;
 
                 if (planeCount * 4 >= verticesCount)
                 {
                     int size = TerrainVertex.Layout.CalculateSize() * step * 4;
-                    var vertices = Vertex.New(Context.CommandList.GraphicsDevice, binding.Buffer.SizeInBytes + size, GraphicsResourceUsage.Dynamic);
-                    CopyBuffer(Context.CommandList, vertices, binding.Buffer, verticesCount);
+                    var vertices = Vertex.New(Context.CommandList.GraphicsDevice, buffer.SizeInBytes + size, GraphicsResourceUsage.Dynamic);
+                    CopyBuffer(Context.CommandList, vertices, buffer, verticesCount);
 
-                    binding = new VertexBufferBinding(vertices, TerrainVertex.Layout, vertices.ElementCount);
-                    VertexBuffers[key] = binding;
+                    VertexBuffer = new VertexBufferBinding(vertices, TerrainVertex.Layout, vertices.ElementCount);
                 }
 
                 if (planeCount * 6 >= indicesCount)

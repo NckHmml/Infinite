@@ -6,7 +6,7 @@ namespace Infinite.Terrain
 {
     public static class TerrainGenerator
     {
-        const double seed = 2000;
+        const double seed = 2001;
         const int maxHeight = 60;
         private static INoise HeightNoise1 { get; } = new SeededNoise(seed, 125);
         private static INoise HeightNoise2 { get; } = new Noise(25);
@@ -54,12 +54,15 @@ namespace Infinite.Terrain
                 cY = chunkPosition.Y * Chunk.Size + y;
                 cZ = chunkPosition.Z * Chunk.Size + z;
 
+                // Combine 2 3D noises to make caves
                 noise = Math.Round(CaveNoise1.Generate(cX, cY, cZ));
                 noise *= Math.Round(CaveNoise2.Generate(cX, cY, cZ));
+                // Powing makes for a more solid 'border'
                 noise *= Math.Pow(CaveNoise3.Generate(cX, cZ), 2);
-                noise *= Math.Max(1, (maxY - chunkBottom - y) / 20d);
+                // The deeper, the more common
+                noise *= Math.Max(1, Math.Min(1.75, (10 + maxY - chunkBottom - y) / 30d));
 
-                return noise > 0.7;
+                return noise > 0.8;
             });
 
             // Generate the surface
