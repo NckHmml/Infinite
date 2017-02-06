@@ -1,16 +1,11 @@
-﻿using Infinite.Helpers;
-using Infinite.Shaders;
+﻿using Infinite.Shaders;
 using SiliconStudio.Core.Mathematics;
-using SiliconStudio.Core.Serialization.Contents;
 using SiliconStudio.Xenko.Engine;
 using SiliconStudio.Xenko.Graphics;
 using SiliconStudio.Xenko.Rendering;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static SiliconStudio.Xenko.Graphics.Buffer;
 using Buffer = SiliconStudio.Xenko.Graphics.Buffer;
 

@@ -2,8 +2,6 @@
 using Infinite.Terrain;
 using SiliconStudio.Xenko.Engine;
 using SiliconStudio.Xenko.Games;
-using SiliconStudio.Xenko.Graphics;
-using SiliconStudio.Xenko.Rendering;
 using System;
 using System.Threading.Tasks;
 
@@ -22,12 +20,6 @@ namespace Infinite
             ProfilerSystem.EnableProfiling(false, GameProfilingKeys.GameDrawFPS);
 
             TerrainDrawer = new TerrainDrawer(GraphicsContext);
-        }
-
-        protected override void Draw(GameTime time)
-        {
-            base.Draw(time);
-            //TerrainDrawer.Draw();
         }
     }
 }

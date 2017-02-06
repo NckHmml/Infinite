@@ -1,6 +1,5 @@
 ﻿using Infinite.Mathematics;
 using SiliconStudio.Core.Mathematics;
-using System;
 using System.Collections.Generic;
 
 namespace Infinite.Terrain

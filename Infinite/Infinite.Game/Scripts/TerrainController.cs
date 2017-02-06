@@ -2,7 +2,6 @@
 using Infinite.Terrain;
 using SiliconStudio.Core.Threading;
 using SiliconStudio.Xenko.Engine;
-using SiliconStudio.Xenko.Rendering;
 using System.Collections.Generic;
 using System.Linq;
 

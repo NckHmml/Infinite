@@ -1,15 +1,12 @@
 ﻿using Infinite.Mathematics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infinite.Terrain
 {
     public static class TerrainGenerator
     {
-        const double seed = 1000;
+        const double seed = 2000;
         const int maxHeight = 60;
         private static INoise HeightNoise1 { get; } = new SeededNoise(seed, 125);
         private static INoise HeightNoise2 { get; } = new Noise(25);

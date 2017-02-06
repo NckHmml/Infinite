@@ -3,7 +3,6 @@ using SiliconStudio.Core;
 using SiliconStudio.Core.Mathematics;
 using SiliconStudio.Xenko.Engine;
 using SiliconStudio.Xenko.Input;
-using System.Diagnostics;
 
 namespace Infinite
 {
@@ -36,7 +35,6 @@ namespace Infinite
         public Vector2 TouchRotationSpeed { get; set; } = new Vector2(60.0f, 40.0f);
 
         private Matrix Projection { get; set; }
-        public static Matrix ViewProjection { get; set; }
 
         public override void Start()
         {
@@ -54,7 +52,6 @@ namespace Infinite
 
             // ToDo, get these settings dynamically
             Projection = Matrix.PerspectiveFovRH((float)Math.PI / 4.0f, (float)GraphicsDevice.Presenter.BackBuffer.ViewWidth / GraphicsDevice.Presenter.BackBuffer.ViewHeight, 0.1f, 1000.0f);
-            UpdateLookAt();
         }
 
         public override void Update()
@@ -193,27 +190,6 @@ namespace Infinite
                 Quaternion.RotationMatrix(rotation) *
                 Quaternion.RotationAxis(right, pitch) *
                 Quaternion.RotationAxis(upVector, yaw);
-
-            // Calculate the 'look at' position
-            UpdateLookAt();
-        }
-
-        private void UpdateLookAt()
-        {
-            Vector3 position = new Vector3(Entity.Transform.Position.ToArray());
-            Vector3 rotation = Entity.Transform.RotationEulerXYZ;
-
-            bool toZ = Math.Cos(rotation.Z) < 0;
-            float z = (float)Math.Cos(rotation.Y);
-            float x = (float)Math.Sin(rotation.Y);
-            float y = (float)(Math.Tan(rotation.X));
-            if (!toZ)
-                z *= -1;
-
-            position += new Vector3(-x, y, z);
-
-            Matrix view = Matrix.LookAtRH(Entity.Transform.Position, position, upVector);
-            ViewProjection = Matrix.Multiply(view, Projection);
         }
     }
 }
