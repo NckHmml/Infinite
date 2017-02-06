@@ -1,7 +1,0 @@
-!Texture
-Id: 7f66f368-da34-49ba-9876-dfd011fc9c1b
-SerializedVersion: {Xenko: 1.4.0-beta}
-Tags: []
-Source: ../../Textures/Stone.png
-ColorKeyColor: {R: 255, G: 0, B: 255, A: 255}
-Format: AsIs

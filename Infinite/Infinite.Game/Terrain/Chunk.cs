@@ -88,7 +88,7 @@ namespace Infinite.Terrain
         public static Chunk New(GenericVector3<int> position)
         {
             var chunk = TerrainGenerator.GenerateChunk(position);
-            chunk.Save();
+            //chunk.Save();
             return chunk;
         }
 

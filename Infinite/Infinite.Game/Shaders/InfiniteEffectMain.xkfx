@@ -1,0 +1,18 @@
+﻿namespace Infinite.Shaders
+{
+    params GameParameters
+    {
+        bool EnableColorEffect = false;
+    }
+
+    effect InfiniteEffectMain
+    {
+        using params GameParameters;
+        
+        mixin XenkoForwardShadingEffect;
+
+        if(GameParameters.EnableColorEffect)
+            mixin SimpleColorEffect;
+
+    };
+}

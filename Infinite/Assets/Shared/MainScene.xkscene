@@ -9,6 +9,7 @@ SceneSettings:
             48f0ca3751a76a77beb84d3fe58e0a56:
                 Name: null
                 Camera: 2ad5fe5d-3b59-4089-a0e9-5d0f7ed32ce1/28a069cb-aa75-457d-b3ae-a4880eac317f
+        ModelEffect: InfiniteEffectMain
         Layers:
             7a47b7f8698878fa57234dcf2e70e9e1:
                 Name: SceneGraphicsLayer
@@ -101,6 +102,8 @@ Hierarchy:
         - 2ad5fe5d-3b59-4089-a0e9-5d0f7ed32ce1
         - c48fc89c-3af9-4467-b818-05f65bae9a27
         - 1c411796-e6a0-4f8c-9e1f-b0a7c60406cb
+        - e15051a3-a6e7-4718-8f87-941d5dbed05c
+        - 539f4a3a-50af-4291-a93a-7c46a1cd6c58
     Parts:
         -   Entity:
                 Id: 1c411796-e6a0-4f8c-9e1f-b0a7c60406cb
@@ -140,6 +143,27 @@ Hierarchy:
                         MouseRotationSpeed: {X: 90.0, Y: 60.0}
                         TouchRotationSpeed: {X: 60.0, Y: 40.0}
         -   Entity:
+                Id: 539f4a3a-50af-4291-a93a-7c46a1cd6c58
+                Name: Directional light (2)
+                Components:
+                    b49cb9b00391500cb8644b3246028d3a: !TransformComponent
+                        Id: 50a55f45-3bfa-49b4-8131-fc158456db37
+                        Position: {X: 0.0, Y: 2.0, Z: 0.0}
+                        Rotation: {X: -0.4967318, Y: 0.409576029, Z: 0.286788285, W: 0.709406435}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+                    5eaef471ffe6ca4d68d302d03b1ce33d: !LightComponent
+                        Id: 45fccd64-4a00-4054-9956-48462ae270f2
+                        Type: !LightDirectional
+                            Color: !ColorRgbProvider
+                                Value: {R: 1.0, G: 1.0, B: 1.0}
+                            Shadow:
+                                Size: Large
+                                DepthRange: {}
+                                PartitionMode: !LightDirectionalShadowMap.PartitionLogarithmic {}
+                                BiasParameters: {}
+                        Intensity: 0.5
+        -   Entity:
                 Id: c48fc89c-3af9-4467-b818-05f65bae9a27
                 Name: TerrainController
                 Components:
@@ -151,3 +175,24 @@ Hierarchy:
                         Children: {}
                     8829968947a313e5e83daa19b66b6de9: !Scripts.TerrainController,Infinite.Game
                         Id: 2c558968-bfea-46ad-8992-e0b93e05581a
+        -   Entity:
+                Id: e15051a3-a6e7-4718-8f87-941d5dbed05c
+                Name: Directional light
+                Components:
+                    9e09a37b9fa9650e9955d9895d658781: !TransformComponent
+                        Id: bcc45ba5-471d-4921-b765-2f71e78a4f6f
+                        Position: {X: 0.0, Y: 2.0, Z: 0.0}
+                        Rotation: {X: -0.4967318, Y: -0.409576029, Z: -0.286788285, W: 0.709406435}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+                    34f5d2ad26b02628072e803f5309646e: !LightComponent
+                        Id: 2b9d51ca-00d2-40d0-b464-4528d3f491d7
+                        Type: !LightDirectional
+                            Color: !ColorRgbProvider
+                                Value: {R: 1.0, G: 1.0, B: 1.0}
+                            Shadow:
+                                Enabled: true
+                                Size: Large
+                                DepthRange: {}
+                                PartitionMode: !LightDirectionalShadowMap.PartitionLogarithmic {}
+                                BiasParameters: {}

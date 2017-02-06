@@ -1,5 +1,8 @@
-﻿using SiliconStudio.Core.Mathematics;
+﻿using Infinite.Helpers;
+using Infinite.Shaders;
+using SiliconStudio.Core.Mathematics;
 using SiliconStudio.Core.Serialization.Contents;
+using SiliconStudio.Xenko.Engine;
 using SiliconStudio.Xenko.Graphics;
 using SiliconStudio.Xenko.Rendering;
 using System;
@@ -18,31 +21,27 @@ namespace Infinite.Terrain
         private Dictionary<TerrainTexture, HashSet<int>> PlaneMap { get; } = new Dictionary<TerrainTexture, HashSet<int>>();
         private Dictionary<int, TerrainPlane> Planes { get; } = new Dictionary<int, TerrainPlane>();
         private Dictionary<TerrainTexture, VertexBufferBinding> VertexBuffers { get; } = new Dictionary<TerrainTexture, VertexBufferBinding>();
-        private Dictionary<TerrainTexture, EffectInstance> Effects { get; } = new Dictionary<TerrainTexture, EffectInstance>();
 
         private const int PlaneStep = 1000;
         private int PlaneCount = 0;
-        private int VertexSize = VertexPositionNormalTexture.Layout.CalculateSize();
+        private int VertexSize = TerrainVertex.Layout.CalculateSize();
         private Object PlaneLock = new Object();
 
         private Buffer Indices;
         private MutablePipelineState PipelineState;
         private GraphicsContext Context;
 
-        private bool Initialized = false;
-
         public TerrainDrawer(GraphicsContext context)
         {
             Context = context;
         }
 
-        public void Initialize(ContentManager content, IEnumerable<TerrainPlane> planes = null)
+        public void Initialize(IEnumerable<TerrainPlane> planes = null)
         {
             GraphicsDevice device = Context.CommandList.GraphicsDevice;
-            LoadTextures(device, content);
 
             PipelineState = new MutablePipelineState(device);
-            PipelineState.State.InputElements = VertexPositionNormalTexture.Layout.CreateInputElements();
+            PipelineState.State.InputElements = TerrainVertex.Layout.CreateInputElements();
             PipelineState.State.SetDefaults();
             PipelineState.State.PrimitiveType = PrimitiveType.TriangleList;
 
@@ -51,8 +50,6 @@ namespace Infinite.Terrain
             count += PlaneStep;
             InitialAddPlanes(planes);
             CreateIndices(device, count);
-
-            Initialized = true;
         }
 
         public void AddPlane(TerrainPlane plane)
@@ -61,7 +58,7 @@ namespace Infinite.Terrain
             {
                 TerrainTexture key = plane.Texture;
                 EnsureCapacity(key);
-                SetVertices(key, plane, PlaneMap[key].Count);
+                SetVertices(plane, PlaneMap[key].Count);
 
                 if (!PlaneMap.ContainsKey(key))
                     PlaneMap.Add(key, new HashSet<int>());
@@ -72,50 +69,26 @@ namespace Infinite.Terrain
             }
         }
 
-        public void Draw()
+        public IEnumerable<Entity> CreateEntities()
         {
-            // We cannot draw without the ViewProjection
-            if (BasicCameraController.ViewProjection == null || !Initialized)
-                return;
-
-            CommandList commandList = Context.CommandList;
-
-            // Update pipeline state
-            PipelineState.State.RootSignature = Effects.FirstOrDefault().Value.RootSignature;
-            PipelineState.State.EffectBytecode = Effects.FirstOrDefault().Value.Effect.Bytecode;
-            PipelineState.State.RasterizerState = RasterizerStates.Wireframe;
-            PipelineState.State.Output.CaptureState(commandList);
-            PipelineState.Update();
-            commandList.SetPipelineState(PipelineState.CurrentState);
-
-            // Set the index buffer
-            commandList.SetIndexBuffer(Indices, 0, true);
-
             foreach (TerrainTexture textureKey in PlaneMap.Keys)
             {
-                // Get/Set vertex buffer
-                VertexBufferBinding binding = VertexBuffers[textureKey];
-                commandList.SetVertexBuffer(0, binding.Buffer, 0, binding.Stride);
+                var model = new Model();
+                model.Add(new Mesh
+                {
+                    Draw = new MeshDraw
+                    {
+                        PrimitiveType = PrimitiveType.TriangleList,
+                        VertexBuffers = new[] { VertexBuffers[textureKey] },
+                        IndexBuffer = new IndexBufferBinding(Indices, true, Indices.ElementCount),
+                        DrawCount = PlaneMap[textureKey].Count * 6
+                    },
+                });
+                model.Meshes[0].Parameters.Set(GameParameters.EnableColorEffect, true);
 
-                // Transform and apply effect
-                Effects[textureKey].Parameters.Set(SpriteBaseKeys.MatrixTransform, BasicCameraController.ViewProjection);
-                Effects[textureKey].Apply(Context);
-
-                // Draw
-                commandList.DrawIndexed(PlaneMap[textureKey].Count * 6);
-            }
-        }
-
-        private void LoadTextures(GraphicsDevice device, ContentManager content)
-        {
-            foreach(TerrainTexture key in Enum.GetValues(typeof(TerrainTexture)))
-            {
-                string name = Enum.GetName(typeof(TerrainTexture), key);
-                var texture = content.Load<Texture>($"Terrain/{name}");
-                var effect = new EffectInstance(new Effect(device, SpriteEffect.Bytecode));
-                effect.Parameters.Set(TexturingKeys.Texture0, texture);
-                effect.UpdateEffect(device);
-                Effects.Add(key, effect);
+                var entity = new Entity();
+                entity.Add(new ModelComponent(model));
+                yield return entity;
             }
         }
 
@@ -147,7 +120,7 @@ namespace Infinite.Terrain
                     foreach (int planeKey in PlaneMap[key])
                     {
                         TerrainPlane plane = Planes[planeKey];
-                        SetVertices(key, plane, index++);
+                        SetVertices(plane, index++);
                     }
                 }
             }
@@ -171,12 +144,13 @@ namespace Infinite.Terrain
             Indices = Index.New(device, indices);
         }
 
-        private unsafe void SetVertices(TerrainTexture key, TerrainPlane plane, int offset)
+        private unsafe void SetVertices(TerrainPlane plane, int offset)
         {
+            TerrainTexture key = plane.Texture;
             Buffer vertices = VertexBuffers[key].Buffer;
 
             MappedResource map = Context.CommandList.MapSubresource(vertices, 0, MapMode.WriteNoOverwrite);
-            var pointer = (VertexPositionNormalTexture*)map.DataBox.DataPointer;
+            var pointer = (TerrainVertex*)map.DataBox.DataPointer;
             pointer += offset * 4;
 
             // Texture UV coordinates
@@ -208,10 +182,10 @@ namespace Infinite.Terrain
                     cornerBtmRight = plane.Position + corner4;
                     normal = Vector3.UnitY;
 
-                    pointer[0] = new VertexPositionNormalTexture(cornerTopRight, normal, textureBtmLeft);
-                    pointer[1] = new VertexPositionNormalTexture(cornerTopLeft, normal, textureBtmRight);
-                    pointer[2] = new VertexPositionNormalTexture(cornerBtmLeft, normal, textureTopRight);
-                    pointer[3] = new VertexPositionNormalTexture(cornerBtmRight, normal, textureTopLeft);
+                    pointer[0] = new TerrainVertex(cornerTopRight, normal, key);
+                    pointer[1] = new TerrainVertex(cornerTopLeft, normal, key);
+                    pointer[2] = new TerrainVertex(cornerBtmLeft, normal, key);
+                    pointer[3] = new TerrainVertex(cornerBtmRight, normal, key);
                     break;
                 case TerrainPlane.Sides.Bottom:
                     cornerTopLeft = plane.Position + corner5;
@@ -220,10 +194,10 @@ namespace Infinite.Terrain
                     cornerBtmRight = plane.Position + corner8;
                     normal = -Vector3.UnitY;
 
-                    pointer[0] = new VertexPositionNormalTexture(cornerBtmLeft, normal, textureTopRight);
-                    pointer[1] = new VertexPositionNormalTexture(cornerTopLeft, normal, textureBtmRight);
-                    pointer[2] = new VertexPositionNormalTexture(cornerTopRight, normal, textureBtmLeft);
-                    pointer[3] = new VertexPositionNormalTexture(cornerBtmRight, normal, textureTopLeft);
+                    pointer[0] = new TerrainVertex(cornerBtmLeft, normal, key);
+                    pointer[1] = new TerrainVertex(cornerTopLeft, normal, key);
+                    pointer[2] = new TerrainVertex(cornerTopRight, normal, key);
+                    pointer[3] = new TerrainVertex(cornerBtmRight, normal, key);
                     break;
                 case TerrainPlane.Sides.Front:
                     cornerTopLeft = plane.Position + corner3;
@@ -232,10 +206,10 @@ namespace Infinite.Terrain
                     cornerBtmRight = plane.Position + corner5;
                     normal = Vector3.UnitZ;
 
-                    pointer[0] = new VertexPositionNormalTexture(cornerTopRight, normal, textureBtmLeft);
-                    pointer[1] = new VertexPositionNormalTexture(cornerTopLeft, normal, textureBtmRight);
-                    pointer[2] = new VertexPositionNormalTexture(cornerBtmLeft, normal, textureTopRight);
-                    pointer[3] = new VertexPositionNormalTexture(cornerBtmRight, normal, textureTopLeft);
+                    pointer[0] = new TerrainVertex(cornerTopRight, normal, key);
+                    pointer[1] = new TerrainVertex(cornerTopLeft, normal, key);
+                    pointer[2] = new TerrainVertex(cornerBtmLeft, normal, key);
+                    pointer[3] = new TerrainVertex(cornerBtmRight, normal, key);
                     break;
                 case TerrainPlane.Sides.Back:
                     cornerTopLeft = plane.Position + corner4;
@@ -244,10 +218,10 @@ namespace Infinite.Terrain
                     cornerBtmRight = plane.Position + corner6;
                     normal = -Vector3.UnitZ;
 
-                    pointer[0] = new VertexPositionNormalTexture(cornerBtmLeft, normal, textureTopRight);
-                    pointer[1] = new VertexPositionNormalTexture(cornerTopLeft, normal, textureBtmRight);
-                    pointer[2] = new VertexPositionNormalTexture(cornerTopRight, normal, textureBtmLeft);
-                    pointer[3] = new VertexPositionNormalTexture(cornerBtmRight, normal, textureTopLeft);
+                    pointer[0] = new TerrainVertex(cornerBtmLeft, normal, key);
+                    pointer[1] = new TerrainVertex(cornerTopLeft, normal, key);
+                    pointer[2] = new TerrainVertex(cornerTopRight, normal, key);
+                    pointer[3] = new TerrainVertex(cornerBtmRight, normal, key);
                     break;
                 case TerrainPlane.Sides.Left:
                     cornerTopLeft = plane.Position + corner1;
@@ -256,10 +230,10 @@ namespace Infinite.Terrain
                     cornerBtmRight = plane.Position + corner6;
                     normal = Vector3.UnitX;
 
-                    pointer[0] = new VertexPositionNormalTexture(cornerTopRight, normal, textureBtmLeft);
-                    pointer[1] = new VertexPositionNormalTexture(cornerTopLeft, normal, textureBtmRight);
-                    pointer[2] = new VertexPositionNormalTexture(cornerBtmLeft, normal, textureTopRight);
-                    pointer[3] = new VertexPositionNormalTexture(cornerBtmRight, normal, textureTopLeft);
+                    pointer[0] = new TerrainVertex(cornerTopRight, normal, key);
+                    pointer[1] = new TerrainVertex(cornerTopLeft, normal, key);
+                    pointer[2] = new TerrainVertex(cornerBtmLeft, normal, key);
+                    pointer[3] = new TerrainVertex(cornerBtmRight, normal, key);
                     break;
                 case TerrainPlane.Sides.Right:
                     cornerTopLeft = plane.Position + corner3;
@@ -268,10 +242,10 @@ namespace Infinite.Terrain
                     cornerBtmRight = plane.Position + corner8;
                     normal = -Vector3.UnitX;
 
-                    pointer[0] = new VertexPositionNormalTexture(cornerBtmLeft, normal, textureTopRight);
-                    pointer[1] = new VertexPositionNormalTexture(cornerTopLeft, normal, textureBtmRight);
-                    pointer[2] = new VertexPositionNormalTexture(cornerTopRight, normal, textureBtmLeft);
-                    pointer[3] = new VertexPositionNormalTexture(cornerBtmRight, normal, textureTopLeft);
+                    pointer[0] = new TerrainVertex(cornerBtmLeft, normal, key);
+                    pointer[1] = new TerrainVertex(cornerTopLeft, normal, key);
+                    pointer[2] = new TerrainVertex(cornerTopRight, normal, key);
+                    pointer[3] = new TerrainVertex(cornerBtmRight, normal, key);
                     break;
             }
 
@@ -282,9 +256,9 @@ namespace Infinite.Terrain
         {
             if (!VertexBuffers.ContainsKey(key))
             {
-                int size = VertexPositionNormalTexture.Layout.CalculateSize() * step * 4;
+                int size = TerrainVertex.Layout.CalculateSize() * step * 4;
                 var vertices = Vertex.New(Context.CommandList.GraphicsDevice, size, GraphicsResourceUsage.Dynamic);
-                var binding = new VertexBufferBinding(vertices, VertexPositionNormalTexture.Layout, vertices.ElementCount);
+                var binding = new VertexBufferBinding(vertices, TerrainVertex.Layout, vertices.ElementCount);
                 VertexBuffers.Add(key, binding);
             }
             else
@@ -296,11 +270,11 @@ namespace Infinite.Terrain
 
                 if (planeCount * 4 >= verticesCount)
                 {
-                    int size = VertexPositionNormalTexture.Layout.CalculateSize() * step * 4;
-                    var vertices =  Vertex.New(Context.CommandList.GraphicsDevice, binding.Buffer.SizeInBytes + size, GraphicsResourceUsage.Dynamic);
+                    int size = TerrainVertex.Layout.CalculateSize() * step * 4;
+                    var vertices = Vertex.New(Context.CommandList.GraphicsDevice, binding.Buffer.SizeInBytes + size, GraphicsResourceUsage.Dynamic);
                     CopyBuffer(Context.CommandList, vertices, binding.Buffer, verticesCount);
 
-                    binding = new VertexBufferBinding(vertices, VertexPositionNormalTexture.Layout, vertices.ElementCount);
+                    binding = new VertexBufferBinding(vertices, TerrainVertex.Layout, vertices.ElementCount);
                     VertexBuffers[key] = binding;
                 }
 
@@ -313,8 +287,8 @@ namespace Infinite.Terrain
         {
             MappedResource oldMap = commandList.MapSubresource(oldBuffer, 0, MapMode.WriteNoOverwrite);
             MappedResource newMap = commandList.MapSubresource(newBuffer, 0, MapMode.WriteNoOverwrite);
-            var oldPointer = (VertexPositionNormalTexture*)oldMap.DataBox.DataPointer;
-            var newPointer = (VertexPositionNormalTexture*)newMap.DataBox.DataPointer;
+            var oldPointer = (TerrainVertex*)oldMap.DataBox.DataPointer;
+            var newPointer = (TerrainVertex*)newMap.DataBox.DataPointer;
 
             for (int i = 0; i < count; i++)
                 newPointer[i] = oldPointer[i];

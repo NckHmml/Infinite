@@ -9,12 +9,13 @@ namespace Infinite.Terrain
 {
     public static class TerrainGenerator
     {
-        const double seed = 10000;
-        private static INoise HeightNoise1 { get; } = new SeededNoise(seed, 100);
+        const double seed = 1000;
+        const int maxHeight = 60;
+        private static INoise HeightNoise1 { get; } = new SeededNoise(seed, 125);
         private static INoise HeightNoise2 { get; } = new Noise(25);
-        private static INoise CaveNoise1 { get; } = new SeededNoise(seed, 14);
-        private static INoise CaveNoise2 { get; } = new Noise(14);
-        private static INoise CaveNoise3 { get; } = new SeededNoise(seed, 200);
+        private static INoise CaveNoise1 { get; } = new SeededNoise(seed, 15);
+        private static INoise CaveNoise2 { get; } = new Noise(15);
+        private static INoise CaveNoise3 { get; } = new SeededNoise(seed, 250);
 
         public static Chunk GenerateChunk(GenericVector3<int> chunkPosition)
         {
@@ -37,9 +38,9 @@ namespace Infinite.Terrain
                 cX = chunkPosition.X * Chunk.Size + x;
                 cZ = chunkPosition.Z * Chunk.Size + z;
 
-                noise = .8 * HeightNoise1.Generate(cX, cZ);
-                noise += .2 * HeightNoise2.Generate(cX, cZ);
-                return (int)(1 + noise * 50);
+                noise = .93 * HeightNoise1.Generate(cX, cZ);
+                noise += .07 * HeightNoise2.Generate(cX, cZ);
+                return (int)(1 + noise * maxHeight);
             });
 
             // Generate cave map
@@ -59,7 +60,7 @@ namespace Infinite.Terrain
                 noise = Math.Round(CaveNoise1.Generate(cX, cY, cZ));
                 noise *= Math.Round(CaveNoise2.Generate(cX, cY, cZ));
                 noise *= Math.Pow(CaveNoise3.Generate(cX, cZ), 2);
-                noise *= Math.Max(1, (maxY - chunkBottom - y) / 15d);
+                noise *= Math.Max(1, (maxY - chunkBottom - y) / 20d);
 
                 return noise > 0.7;
             });
@@ -111,7 +112,7 @@ namespace Infinite.Terrain
                         if (iY > 0 && !caveMap[x, iY, z])
                         {
                             var position = new GenericVector3<byte>((byte)x, (byte)iY, (byte)z);
-                            Block.MaterialType material = i < 3 ? Block.MaterialType.Soil : Block.MaterialType.Stone;
+                            Block.MaterialType material = i < 3 ? Block.MaterialType.Grass : Block.MaterialType.Stone;
                             AddSide(blocks, position, GetSides(position, heightMap, chunkBottom), material);
                             if (caveMap[x - 1, iY, z])
                                 AddSide(blocks, position, Block.Adjecent.Left);
