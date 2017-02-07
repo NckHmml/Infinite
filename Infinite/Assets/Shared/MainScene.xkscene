@@ -40,16 +40,21 @@ SceneSettings:
                             Enabled: false
                         DepthOfField:
                             Enabled: false
+                            MaxBokehSize: 0.02
                             DOFAreas: {X: 0.5, Y: 6.0, Z: 50.0, W: 200.0}
                         BrightFilter:
+                            Enabled: false
                             Color: {R: 1.0, G: 1.0, B: 1.0}
                         Bloom:
+                            Enabled: false
                             Distortion: {X: 1.0, Y: 1.0}
                             Afterimage:
                                 Enabled: false
                         LightStreak:
+                            Enabled: false
                             Attenuation: 0.7
-                        LensFlare: {}
+                        LensFlare:
+                            Enabled: false
                         ColorTransforms:
                             Transforms:
                                 131a9fcbfd186ed93d251a9f7ecc834d: !ToneMap
@@ -103,7 +108,7 @@ Hierarchy:
         - c48fc89c-3af9-4467-b818-05f65bae9a27
         - 1c411796-e6a0-4f8c-9e1f-b0a7c60406cb
         - e15051a3-a6e7-4718-8f87-941d5dbed05c
-        - 539f4a3a-50af-4291-a93a-7c46a1cd6c58
+        - d9b5867f-e75c-4f03-a2b8-f8a126478455
     Parts:
         -   Entity:
                 Id: 1c411796-e6a0-4f8c-9e1f-b0a7c60406cb
@@ -127,42 +132,36 @@ Hierarchy:
                 Components:
                     4564f0aa6309dc15fd68ba3cbb401360: !TransformComponent
                         Id: 05d28cb8-106f-4bae-92d0-f4326ea2a208
-                        Position: {X: 0.0, Y: 0.0, Z: 0.0}
+                        Position: {X: 0.0, Y: 40.0, Z: 0.0}
                         Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
                         Scale: {X: 1.0, Y: 1.0, Z: 1.0}
                         Children: {}
                     f5f7b3c7af719786e617650f65ae8367: !CameraComponent
                         Id: 28a069cb-aa75-457d-b3ae-a4880eac317f
                         Projection: Perspective
-                    cbd616fde4f9f2fb3958054b51f111b7: !Infinite.BasicCameraController,Infinite.Game
-                        Id: 7e3ca1ff-cdbe-46f9-a027-419e20fdcb7b
-                        KeyboardMovementSpeed: {X: 5.0, Y: 5.0, Z: 5.0}
-                        TouchMovementSpeed: {X: 40.0, Y: 40.0, Z: 20.0}
-                        SpeedFactor: 5.0
-                        KeyboardRotationSpeed: {X: 3.0, Y: 3.0}
-                        MouseRotationSpeed: {X: 90.0, Y: 60.0}
-                        TouchRotationSpeed: {X: 60.0, Y: 40.0}
-        -   Entity:
-                Id: 539f4a3a-50af-4291-a93a-7c46a1cd6c58
-                Name: Directional light (2)
-                Components:
-                    b49cb9b00391500cb8644b3246028d3a: !TransformComponent
-                        Id: 50a55f45-3bfa-49b4-8131-fc158456db37
-                        Position: {X: 0.0, Y: 2.0, Z: 0.0}
-                        Rotation: {X: -0.4967318, Y: 0.409576029, Z: 0.286788285, W: 0.709406435}
-                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children: {}
-                    5eaef471ffe6ca4d68d302d03b1ce33d: !LightComponent
-                        Id: 45fccd64-4a00-4054-9956-48462ae270f2
-                        Type: !LightDirectional
-                            Color: !ColorRgbProvider
-                                Value: {R: 1.0, G: 1.0, B: 1.0}
-                            Shadow:
-                                Size: Large
-                                DepthRange: {}
-                                PartitionMode: !LightDirectionalShadowMap.PartitionLogarithmic {}
-                                BiasParameters: {}
-                        Intensity: 0.5
+                    1ab5bb74662e18bb0dd47c015871115d: !CharacterComponent
+                        Id: b92a695a-298b-4ce5-9d71-466bdc4370c7
+                        CanSleep: false
+                        Restitution: 0.0
+                        Friction: 0.5
+                        RollingFriction: 0.0
+                        CcdMotionThreshold: 0.0
+                        CcdSweptSphereRadius: 0.0
+                        FallSpeed: 10.0
+                        MaxSlope: {Radians: 0.7853982}
+                        JumpSpeed: 5.0
+                        Gravity: -10.0
+                        ColliderShapes:
+                            32879eb3fc80ecec4dcdba1739df2bc3: !CylinderColliderShapeDesc
+                                Height: 1.8
+                                Radius: 0.35
+                                LocalOffset: {X: 0.0, Y: -0.5, Z: 0.0}
+                                LocalRotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                    81c93e845b4321c5d9615ea5ac19b933: !Scripts.PlayerController,Infinite.Game
+                        Id: abf8a44e-ba59-4a3e-a52e-2576e5d9882c
+                        Speed: 5.0
+                        RotationAdaptationSpeed: 5.0
+                        RotationSpeed: 2.355
         -   Entity:
                 Id: c48fc89c-3af9-4467-b818-05f65bae9a27
                 Name: TerrainController
@@ -175,6 +174,43 @@ Hierarchy:
                         Children: {}
                     8829968947a313e5e83daa19b66b6de9: !Scripts.TerrainController,Infinite.Game
                         Id: 2c558968-bfea-46ad-8992-e0b93e05581a
+                        Player: 2ad5fe5d-3b59-4089-a0e9-5d0f7ed32ce1
+                    ffb54d945b18a3383f83c7e4bb67c3b5: !StaticColliderComponent
+                        Id: 31bdec5a-f54e-41e0-af57-a880dcc93ea3
+                        CanSleep: false
+                        Restitution: 0.0
+                        Friction: 0.5
+                        RollingFriction: 0.0
+                        CcdMotionThreshold: 0.0
+                        CcdSweptSphereRadius: 0.0
+                        IsTrigger: false
+                        ColliderShapes:
+                            a15a7a8883c34c6a1fa5ee161ddf8182: !BoxColliderShapeDesc
+                                Is2D: false
+                                Size: {X: 1.0, Y: 1.0, Z: 1.0}
+                                LocalOffset: {X: 0.0, Y: 0.0, Z: 0.0}
+                                LocalRotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+        -   Entity:
+                Id: d9b5867f-e75c-4f03-a2b8-f8a126478455
+                Name: Directional light (2)
+                Components:
+                    12a89bf29bf8ebdc1d6936d9b5bc082f: !TransformComponent
+                        Id: b33de18a-1a0d-4f47-824d-91f6997827fc
+                        Position: {X: 0.0, Y: 2.0, Z: 0.0}
+                        Rotation: {X: -0.496731818, Y: 0.409576, Z: 0.286788255, W: 0.709406435}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+                    cda1e863a9896da0c6f27e16653ef575: !LightComponent
+                        Id: f7486f6f-2a19-45d4-ba2f-14f733ee8199
+                        Type: !LightDirectional
+                            Color: !ColorRgbProvider
+                                Value: {R: 1.0, G: 1.0, B: 1.0}
+                            Shadow:
+                                Size: Large
+                                DepthRange: {}
+                                PartitionMode: !LightDirectionalShadowMap.PartitionLogarithmic {}
+                                BiasParameters: {}
+                        Intensity: 0.5
         -   Entity:
                 Id: e15051a3-a6e7-4718-8f87-941d5dbed05c
                 Name: Directional light
@@ -182,7 +218,7 @@ Hierarchy:
                     9e09a37b9fa9650e9955d9895d658781: !TransformComponent
                         Id: bcc45ba5-471d-4921-b765-2f71e78a4f6f
                         Position: {X: 0.0, Y: 2.0, Z: 0.0}
-                        Rotation: {X: -0.4967318, Y: -0.409576029, Z: -0.286788285, W: 0.709406435}
+                        Rotation: {X: -0.224143833, Y: -0.4829629, Z: -0.129409581, W: 0.8365163}
                         Scale: {X: 1.0, Y: 1.0, Z: 1.0}
                         Children: {}
                     34f5d2ad26b02628072e803f5309646e: !LightComponent
@@ -196,3 +232,4 @@ Hierarchy:
                                 DepthRange: {}
                                 PartitionMode: !LightDirectionalShadowMap.PartitionLogarithmic {}
                                 BiasParameters: {}
+                        Intensity: 0.5

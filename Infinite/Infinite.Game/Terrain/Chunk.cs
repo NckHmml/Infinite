@@ -17,7 +17,8 @@ namespace Infinite.Terrain
             if (blocks != null)
             {
                 foreach (var pair in blocks)
-                    Blocks.Add(pair.Key, pair.Value);
+                    if (pair.Value.Material != Block.MaterialType.None && pair.Value.Sides != Block.Adjecent.None)
+                        Blocks.Add(pair.Key, pair.Value);
             }
         }
 

@@ -30,5 +30,15 @@ namespace Infinite.Mathematics
                 return Item3;
             }
         }
+
+        public static bool operator ==(GenericVector3<T> left, GenericVector3<T> right)
+        {
+            return left?.Equals(right) ?? false;
+        }
+
+        public static bool operator !=(GenericVector3<T> left, GenericVector3<T> right)
+        {
+            return !(left == right);
+        }
     }
 }

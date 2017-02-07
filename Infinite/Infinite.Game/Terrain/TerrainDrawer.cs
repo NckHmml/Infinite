@@ -2,6 +2,7 @@
 using SiliconStudio.Core.Mathematics;
 using SiliconStudio.Xenko.Engine;
 using SiliconStudio.Xenko.Graphics;
+using SiliconStudio.Xenko.Physics;
 using SiliconStudio.Xenko.Rendering;
 using System;
 using System.Collections.Generic;

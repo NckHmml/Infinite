@@ -1,7 +1,9 @@
 ﻿using Infinite;
+using Infinite.Mathematics;
 using Infinite.Terrain;
 using SiliconStudio.Core.Threading;
 using SiliconStudio.Xenko.Engine;
+using SiliconStudio.Xenko.Physics;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,10 +11,11 @@ namespace Scripts
 {
     public class TerrainController : SyncScript
     {
+        public Entity Player { get; set; }
+        //private bool ColliderShapesRendering = false;
+
         public override void Start()
         {
-            var chunks = new List<Chunk>();
-
             const int width = 8;
             const int end = width / 2;
             const int start = -end;
@@ -20,10 +23,10 @@ namespace Scripts
             {
                 for (int y = -6; y < 2; y++)
                     for (int z = start; z < end; z++)
-                        chunks.Add(Chunk.Load(x, y, z));
+                        World.Chunks.Add(new GenericVector3<int>(x, y, z), Chunk.Load(x, y, z));
             });
 
-            IEnumerable<TerrainPlane> planes = chunks.SelectMany(x => x.GetPlanes());
+            IEnumerable<TerrainPlane> planes = World.Chunks.Values.SelectMany(x => x.GetPlanes());
 
             InfiniteGame.TerrainDrawer.Initialize(planes);
             Entity entity = InfiniteGame.TerrainDrawer.CreateEntity();
@@ -33,7 +36,20 @@ namespace Scripts
 
         public override void Update()
         {
-            
+            Simulation similation = this.GetSimulation();
+            //if (!ColliderShapesRendering)
+            //{
+            //    ColliderShapesRendering = true;
+            //    similation.ColliderShapesRendering = ColliderShapesRendering;
+            //}
+
+            //if (TerrainCollider.Update(Entity, Player))
+            //{
+            //    ColliderShapesRendering = false;
+            //    similation.ColliderShapesRendering = ColliderShapesRendering;
+            //}
+
+            TerrainCollider.Update(Entity, Player);
         }
     }
 }

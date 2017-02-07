@@ -131,7 +131,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rendering\GamePipelinePlugin.cs" />
     <Compile Include="Rendering\GameRenderFeature.cs" />
-    <Compile Include="Scripts\BasicCameraController.cs" />
+    <Compile Include="Scripts\PlayerController.cs" />
     <Compile Include="Scripts\TerrainController.cs" />
     <Compile Include="Shaders\InfiniteEffectMain.cs">
       <AutoGen>True</AutoGen>
@@ -147,11 +147,13 @@
     </Compile>
     <Compile Include="Terrain\Block.cs" />
     <Compile Include="Terrain\Chunk.cs" />
+    <Compile Include="Terrain\TerrainCollider.cs" />
     <Compile Include="Terrain\TerrainDrawer.cs" />
     <Compile Include="Terrain\TerrainGenerator.cs" />
     <Compile Include="Terrain\TerrainPlane.cs" />
     <Compile Include="Terrain\TerrainTexture.cs" />
     <Compile Include="Terrain\TerrainVertex.cs" />
+    <Compile Include="World.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="$(SiliconStudioPackageProps)" Condition="Exists('$(SiliconStudioPackageProps)')" />

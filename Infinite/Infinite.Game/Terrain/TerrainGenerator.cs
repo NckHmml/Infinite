@@ -57,10 +57,16 @@ namespace Infinite.Terrain
                 // Combine 2 3D noises to make caves
                 noise = Math.Round(CaveNoise1.Generate(cX, cY, cZ));
                 noise *= Math.Round(CaveNoise2.Generate(cX, cY, cZ));
-                // Powing makes for a more solid 'border'
-                noise *= Math.Pow(CaveNoise3.Generate(cX, cZ), 2);
                 // The deeper, the more common
-                noise *= Math.Max(1, Math.Min(1.75, (10 + maxY - chunkBottom - y) / 30d));
+                double pow = (cY + 128d) / 128d;
+                if (pow < 0.0)
+                    pow = 0;
+                if (pow > 1.0)
+                    pow = 1;
+                pow = 1 - pow;
+
+                // Powing makes for a more solid 'border'
+                noise *= Math.Pow(CaveNoise3.Generate(cX, cZ), 2 - pow);
 
                 return noise > 0.8;
             });
@@ -132,7 +138,6 @@ namespace Infinite.Terrain
                     // Render cave
                     for (int y = 0; y < Chunk.Size && y + chunkBottom < maxY; y++)
                     {
-                        #region Cave blocks
                         var position = new GenericVector3<byte>((byte)x, (byte)y, (byte)z);
 
                         if (caveMap[x, y, z])
@@ -149,7 +154,6 @@ namespace Infinite.Terrain
                             AddSide(blocks, position, Block.Adjecent.Back);
                         if (!caveMap[x, y, z] && caveMap[x, y, z + 1])
                             AddSide(blocks, position, Block.Adjecent.Front);
-                        #endregion
                     }
                 }
             }
