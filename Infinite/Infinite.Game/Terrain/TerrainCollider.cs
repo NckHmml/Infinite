@@ -22,12 +22,6 @@ namespace Infinite.Terrain
                 return false;
             LastPosition = position;
 
-            if ((int)playerPosition.Z == -1)
-            {
-                Debug.WriteLine(World.HasBlock(-4, 14, -64));
-                Debug.WriteLine(World.HasBlock(-4, 14, -63));
-            }
-
             var compound = new CompoundColliderShape();
             foreach (var shape in GetColliderBoxes(playerPosition))
                 compound.AddChildShape(shape);
