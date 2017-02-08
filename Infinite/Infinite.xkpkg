@@ -38,4 +38,5 @@ ExplicitFolders: []
 Bundles: []
 TemplateFolders: []
 RootAssets:
+    - 70a7d4ec-cefb-4606-bbd9-7b3c466f539f:Models/Tree
     - c3a8ee37-5f38-4616-847d-8df9ecbc382d:Skybox Texture

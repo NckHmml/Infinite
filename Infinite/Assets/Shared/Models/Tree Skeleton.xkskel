@@ -1,0 +1,11 @@
+!Skeleton
+Id: 4bc67e62-edf0-47ab-a799-ecfa01c87488
+SerializedVersion: {Xenko: 1.7.8-beta}
+Tags: []
+Source: ../../Models/Tree.obj
+PivotPosition: {X: 0.0, Y: 0.0, Z: 0.0}
+Nodes:
+    82d4d4610cffc18dde42970854b48f33: {Name: Tree.obj, Depth: 0}
+    c4ae2cc8a802d4dcc308ec72f15819ca: {Name: defaultobject, Depth: 1}
+~SourceHashes:
+    537c30719614e37ba4cc19ac8c2013f4~../../Models/Tree.obj: 71ce310e6ac916eeaec21f283619a14f
