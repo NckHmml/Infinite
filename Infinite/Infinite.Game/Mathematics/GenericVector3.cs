@@ -2,6 +2,8 @@
 
 namespace Infinite.Mathematics
 {
+#pragma warning disable CS0660 // Type defines operator == or operator != but does not override Object.Equals(object o)
+#pragma warning disable CS0661 // Type defines operator == or operator != but does not override Object.GetHashCode()
     public class GenericVector3<T> : Tuple<T, T, T>
     {
         public GenericVector3(T x, T y, T z): base(x, y, z)
@@ -41,4 +43,6 @@ namespace Infinite.Mathematics
             return !(left == right);
         }
     }
+#pragma warning restore CS0661 // Type defines operator == or operator != but does not override Object.GetHashCode()
+#pragma warning restore CS0660 // Type defines operator == or operator != but does not override Object.Equals(object o)
 }

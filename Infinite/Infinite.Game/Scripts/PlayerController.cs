@@ -1,19 +1,20 @@
-﻿using SiliconStudio.Core;
-using SiliconStudio.Core.Mathematics;
+﻿using SiliconStudio.Core.Mathematics;
 using SiliconStudio.Xenko.Engine;
 using SiliconStudio.Xenko.Input;
 using SiliconStudio.Xenko.Physics;
 using System;
-using System.Linq;
 
-namespace Scripts
+namespace Infinite.Scripts
 {
     public class PlayerController : SyncScript
     {
+        public static int Jumps = 0;
+        public int MaxJumps = 3;
+
         private static readonly Vector3 UpVector = new Vector3(0, 1, 0);
         private static readonly Vector3 ForwardVector = new Vector3(0, 0, -1);
         
-        public float Speed { get; set; } = 5.0f;
+        public float Speed { get; set; } = 250f;
 
         private CharacterComponent character;
 
@@ -121,11 +122,17 @@ namespace Scripts
             move *= translationSpeed;
 
             //please note that the default character controller ignores rotation, in the case of complex collisions you would have more kinematic elements within your model anyway.
-            character.Move(move);
+            character.SetVelocity(move);
 
             if (Input.IsKeyPressed(Keys.Space))
             {
-                character.Jump();
+                if (character.IsGrounded)
+                    Jumps = 0;
+                if (Jumps < MaxJumps)
+                {
+                    character.Jump();
+                    Jumps++;
+                }
             }
 
             if (Input.IsKeyReleased(Keys.Escape))

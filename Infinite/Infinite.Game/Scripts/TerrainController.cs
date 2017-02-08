@@ -1,5 +1,4 @@
-﻿using Infinite;
-using Infinite.Mathematics;
+﻿using Infinite.Mathematics;
 using Infinite.Terrain;
 using SiliconStudio.Core.Threading;
 using SiliconStudio.Xenko.Engine;
@@ -7,7 +6,7 @@ using SiliconStudio.Xenko.Physics;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Scripts
+namespace Infinite.Scripts
 {
     public class TerrainController : SyncScript
     {
@@ -36,7 +35,7 @@ namespace Scripts
 
         public override void Update()
         {
-            Simulation similation = this.GetSimulation();
+            //Simulation similation = this.GetSimulation();
             //if (!ColliderShapesRendering)
             //{
             //    ColliderShapesRendering = true;

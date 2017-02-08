@@ -128,7 +128,7 @@ Hierarchy:
                         Skybox: b0f64d74-7659-4272-ad1f-44dce64f8603:Skybox
         -   Entity:
                 Id: 2ad5fe5d-3b59-4089-a0e9-5d0f7ed32ce1
-                Name: Camera
+                Name: Player
                 Components:
                     4564f0aa6309dc15fd68ba3cbb401360: !TransformComponent
                         Id: 05d28cb8-106f-4bae-92d0-f4326ea2a208
@@ -149,22 +149,26 @@ Hierarchy:
                         CcdSweptSphereRadius: 0.0
                         FallSpeed: 10.0
                         MaxSlope: {Radians: 0.7853982}
-                        JumpSpeed: 5.0
-                        Gravity: -10.0
+                        JumpSpeed: 7.5
+                        Gravity: -15.0
                         ColliderShapes:
                             32879eb3fc80ecec4dcdba1739df2bc3: !CylinderColliderShapeDesc
                                 Height: 1.8
                                 Radius: 0.35
                                 LocalOffset: {X: 0.0, Y: -0.5, Z: 0.0}
                                 LocalRotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
-                    81c93e845b4321c5d9615ea5ac19b933: !Scripts.PlayerController,Infinite.Game
-                        Id: abf8a44e-ba59-4a3e-a52e-2576e5d9882c
-                        Speed: 5.0
+                    1fedd7184aef94c0df815c2f0ef21eab: !Infinite.Scripts.PlayerController,Infinite.Game
+                        Id: c4a19c02-a5e3-48ab-98ae-f0db9940d9d0
+                        MaxJumps: 3
+                        Speed: 250.0
                         RotationAdaptationSpeed: 5.0
                         RotationSpeed: 2.355
+                    39b1a8735cb2dc0edec3629ab61ab511: !Infinite.Scripts.PlayerCollisions,Infinite.Game
+                        Id: 3983deda-3ec8-48be-b63b-f3b5fc5dc8fe
+                        Priority: 1
         -   Entity:
                 Id: c48fc89c-3af9-4467-b818-05f65bae9a27
-                Name: TerrainController
+                Name: Terrain
                 Components:
                     1403b32cb929abec5db185d28550e3bb: !TransformComponent
                         Id: 1f230157-1592-43cb-82c9-98a645758cfc
@@ -172,9 +176,6 @@ Hierarchy:
                         Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
                         Scale: {X: 1.0, Y: 1.0, Z: 1.0}
                         Children: {}
-                    8829968947a313e5e83daa19b66b6de9: !Scripts.TerrainController,Infinite.Game
-                        Id: 2c558968-bfea-46ad-8992-e0b93e05581a
-                        Player: 2ad5fe5d-3b59-4089-a0e9-5d0f7ed32ce1
                     ffb54d945b18a3383f83c7e4bb67c3b5: !StaticColliderComponent
                         Id: 31bdec5a-f54e-41e0-af57-a880dcc93ea3
                         CanSleep: false
@@ -190,6 +191,9 @@ Hierarchy:
                                 Size: {X: 1.0, Y: 1.0, Z: 1.0}
                                 LocalOffset: {X: 0.0, Y: 0.0, Z: 0.0}
                                 LocalRotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                    ad797fccdbcee2bdca2018990d49d11f: !Infinite.Scripts.TerrainController,Infinite.Game
+                        Id: c1713029-a42b-4f3c-9293-bb8d0a02572f
+                        Player: 2ad5fe5d-3b59-4089-a0e9-5d0f7ed32ce1
         -   Entity:
                 Id: d9b5867f-e75c-4f03-a2b8-f8a126478455
                 Name: Directional light (2)

@@ -25,16 +25,16 @@ namespace Infinite.Terrain
             var compound = new CompoundColliderShape();
             foreach (var shape in GetColliderBoxes(playerPosition))
                 compound.AddChildShape(shape);
-
             var collider = terrain.Get<StaticColliderComponent>();
-            collider.ColliderShape = compound;            
+            collider.ColliderShape = compound;
+
             return true;
         }
 
         private static IEnumerable<BoxColliderShape> GetColliderBoxes(Vector3 position)
         {
             const int max = 3;
-            const int min = -4;
+            const int min = -3;
             long cX, cY, cZ;
             for (int x = min; x < max; x++)
             {

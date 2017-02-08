@@ -131,6 +131,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rendering\GamePipelinePlugin.cs" />
     <Compile Include="Rendering\GameRenderFeature.cs" />
+    <Compile Include="Scripts\PlayerCollisions.cs" />
     <Compile Include="Scripts\PlayerController.cs" />
     <Compile Include="Scripts\TerrainController.cs" />
     <Compile Include="Shaders\InfiniteEffectMain.cs">
