@@ -59,7 +59,6 @@ namespace Infinite.Terrain
                 var tree = new Entity(position);
                 var modelComponent = new ModelComponent(model);
                 tree.Add(modelComponent);
-                tree.Transform.Scale = new Vector3(0.6f);
 
                 yield return tree;
             }

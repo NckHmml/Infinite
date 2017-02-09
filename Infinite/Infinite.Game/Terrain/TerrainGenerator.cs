@@ -61,6 +61,8 @@ namespace Infinite.Terrain
                     if (x < 0 || z < 0)
                         return false;
                     maxY = heightMap[x, z];
+                    if (maxY == 1)
+                        return false;
 
                     // Variables for readabilty 
                     cX = chunkPosition.X * Chunk.Size + x;
@@ -68,7 +70,7 @@ namespace Infinite.Terrain
 
                     noise = TreeNoise.Generate(x, z);
                     noise = Math.Round(noise, 1);
-                    return noise == 1;
+                    return noise == 1 || noise == 0;
                 });
 
                 for (int x = 0; x < Chunk.Size; x++)
@@ -159,7 +161,7 @@ namespace Infinite.Terrain
                             {
                                 var position = new GenericVector3<byte>((byte)x, (byte)iY, (byte)z);
 
-                                AddSide(blocks, position, GetSides(position, heightMap, chunkBottom, Block.Adjecent.Top), Block.MaterialType.Grass);
+                                AddSide(blocks, position, GetSides(position, heightMap, chunkBottom, Block.Adjecent.Top), maxY == 1 ? Block.MaterialType.Soil : Block.MaterialType.Grass);
                                 if (caveMap[x - 1, iY, z])
                                     AddSide(blocks, position, Block.Adjecent.Left);
                                 if (caveMap[x + 1, iY, z])
