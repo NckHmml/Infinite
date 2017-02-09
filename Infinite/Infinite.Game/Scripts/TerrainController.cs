@@ -33,13 +33,9 @@ namespace Infinite.Scripts
             Entity entity = InfiniteGame.TerrainDrawer.CreateEntity();
             Entity.AddChild(entity);
 
-            var tree = new Entity(new Vector3(20.5f, 59f, 20.5f));
-            var model = Content.Load<Model>("Models/Tree");
-            var modelComponent = new ModelComponent(model);
-            tree.Add(modelComponent);
-            tree.Transform.Scale = new Vector3(0.6f);
-
-            Entity.AddChild(tree);
+            var spawns = World.Chunks.Values.SelectMany(x => x.GetSpawns(Content));
+            foreach (var spawn in spawns)
+                Entity.AddChild(spawn);
         }
 
 

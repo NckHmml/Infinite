@@ -1,5 +1,8 @@
 ﻿using Infinite.Mathematics;
 using SiliconStudio.Core.Mathematics;
+using SiliconStudio.Core.Serialization.Contents;
+using SiliconStudio.Xenko.Engine;
+using SiliconStudio.Xenko.Rendering;
 using System.Collections.Generic;
 
 namespace Infinite.Terrain
@@ -10,8 +13,9 @@ namespace Infinite.Terrain
         public GenericVector3<int> Position { get; private set; }
 
         public Dictionary<GenericVector3<byte>, Block> Blocks { get; } = new Dictionary<GenericVector3<byte>, Block>();
+        public Dictionary<GenericVector3<byte>, EntitySpawn> Entities { get; } = new Dictionary<GenericVector3<byte>, EntitySpawn>();
 
-        public Chunk(GenericVector3<int> position, Dictionary<GenericVector3<byte>, Block> blocks)
+        public Chunk(GenericVector3<int> position, Dictionary<GenericVector3<byte>, Block> blocks, Dictionary<GenericVector3<byte>, EntitySpawn> entities)
         {
             Position = position;
             if (blocks != null)
@@ -19,6 +23,11 @@ namespace Infinite.Terrain
                 foreach (var pair in blocks)
                     if (pair.Value.Material != Block.MaterialType.None && pair.Value.Sides != Block.Adjecent.None)
                         Blocks.Add(pair.Key, pair.Value);
+            }
+            if (entities != null)
+            {
+                foreach (var pair in entities)
+                    Entities.Add(pair.Key, pair.Value);
             }
         }
 
@@ -32,6 +41,28 @@ namespace Infinite.Terrain
             foreach (var pair in Blocks)
                 foreach (TerrainPlane plane in CheckSides(pair))
                     yield return plane;
+        }
+
+        public IEnumerable<Entity> GetSpawns(ContentManager content)
+        {
+            var model = content.Load<Model>("Models/Tree");
+
+            foreach (var pair in Entities)
+            {
+                var position = new Vector3()
+                {
+                    X = Position.X * Size + pair.Key.X + .5f,
+                    Y = Position.Y * Size + pair.Key.Y + 1,
+                    Z = Position.Z * Size + pair.Key.Z + .5f,
+                };
+
+                var tree = new Entity(position);
+                var modelComponent = new ModelComponent(model);
+                tree.Add(modelComponent);
+                tree.Transform.Scale = new Vector3(0.6f);
+
+                yield return tree;
+            }
         }
 
         private IEnumerable<TerrainPlane> CheckSides(KeyValuePair<GenericVector3<byte>, Block> pair)

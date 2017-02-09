@@ -59,7 +59,7 @@ namespace Infinite
                 foreach (var pair in contract.Blocks)
                     blocks.Add(new GenericVector3<byte>(pair.Key.X, pair.Key.Y, pair.Key.Z), new Block(pair.Value.Material, pair.Value.Sides));
 
-            return new Chunk(position, blocks);
+            return new Chunk(position, blocks, null);
         }
     }
 }

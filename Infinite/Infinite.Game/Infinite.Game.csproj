@@ -148,6 +148,7 @@
     </Compile>
     <Compile Include="Terrain\Block.cs" />
     <Compile Include="Terrain\Chunk.cs" />
+    <Compile Include="Terrain\EntitySpawn.cs" />
     <Compile Include="Terrain\TerrainCollider.cs" />
     <Compile Include="Terrain\TerrainDrawer.cs" />
     <Compile Include="Terrain\TerrainGenerator.cs" />
