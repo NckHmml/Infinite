@@ -1,0 +1,35 @@
+!PrefabAsset
+Id: 67748a84-fcb5-4693-beeb-d328e4991b2e
+SerializedVersion: {Xenko: 1.9.0-beta05}
+Tags: []
+Hierarchy:
+    RootPartIds:
+        - b4859bac-9bce-411e-a761-e50b7d25c1b2
+    Parts:
+        -   Entity:
+                Id: b4859bac-9bce-411e-a761-e50b7d25c1b2
+                Name: Entity
+                Components:
+                    dc389b7ad084dcff3edfaab2a170df20: !TransformComponent
+                        Id: 37769991-11f1-4191-ae16-412a703ff6dc
+                        Position: {X: 0.0, Y: 0.0, Z: 0.0}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+                    5bf0ab675418e9d7c821fc7c58f56536: !ModelComponent
+                        Id: 8a268e13-d33e-44ec-a148-144642e8fc7e
+                        Model: 70a7d4ec-cefb-4606-bbd9-7b3c466f539f:Models/Tree/Model
+                        Materials: {}
+                    12bd56c395c917c2a7125c79b9c75886: !StaticColliderComponent
+                        Id: 991ccf73-f591-4871-949d-0af72a2f1e1f
+                        ProcessCollisions: false
+                        CanSleep: true
+                        Restitution: 0.0
+                        Friction: 0.5
+                        RollingFriction: 0.0
+                        CcdMotionThreshold: 0.0
+                        CcdSweptSphereRadius: 0.0
+                        IsTrigger: false
+                        ColliderShapes:
+                            db014b7a68a4c3ba64cecb03a4c8208b: !ColliderShapeAssetDesc
+                                Shape: 93fd7ee3-8f4b-4a01-a11c-6a348a5faba3:Models/Tree/Hull

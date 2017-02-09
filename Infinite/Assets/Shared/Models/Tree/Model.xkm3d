@@ -1,0 +1,15 @@
+!Model
+Id: 70a7d4ec-cefb-4606-bbd9-7b3c466f539f
+SerializedVersion: {Xenko: 1.5.0-alpha02}
+Tags: []
+Source: ../../../Models/Tree.obj
+PivotPosition: {X: 0.0, Y: 0.0, Z: 0.0}
+ScaleImport: 0.14
+Materials:
+    ab9d2ab80510289109c2504a61e82610:
+        Name: palette
+        MaterialInstance:
+            Material: 706be565-2521-4835-804f-73cf8f9df4d1:Models/Tree/Palette
+Skeleton: 4bc67e62-edf0-47ab-a799-ecfa01c87488:Models/Tree/Skeleton
+~SourceHashes:
+    f223a5ddfb76b66140bd306fd7022b40~../../../Models/Tree.obj: ae1f360ae0f01ec00979b11612351efe

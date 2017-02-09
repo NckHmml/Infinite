@@ -2,7 +2,7 @@
 Id: c8055335-4a5a-48fc-9f42-b2dfbe18c437
 SerializedVersion: {Xenko: 1.4.0-beta}
 Tags: []
-Source: ../../Models/Tree.png
+Source: ../../../Models/Tree.png
 ColorKeyColor: {R: 255, G: 0, B: 255, A: 255}
 Format: AsIs
 PremultiplyAlpha: false

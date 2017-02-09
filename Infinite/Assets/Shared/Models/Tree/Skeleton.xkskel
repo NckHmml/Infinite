@@ -2,11 +2,11 @@
 Id: 4bc67e62-edf0-47ab-a799-ecfa01c87488
 SerializedVersion: {Xenko: 1.7.8-beta}
 Tags: []
-Source: ../../Models/Tree.obj
+Source: ../../../Models/Tree.obj
 PivotPosition: {X: 0.0, Y: 0.0, Z: 0.0}
 ScaleImport: 0.14
 Nodes:
     82d4d4610cffc18dde42970854b48f33: {Name: Tree.obj, Depth: 0}
     c4ae2cc8a802d4dcc308ec72f15819ca: {Name: defaultobject, Depth: 1}
 ~SourceHashes:
-    537c30719614e37ba4cc19ac8c2013f4~../../Models/Tree.obj: 6788c10a8a23baf95ee692049edae092
+    ae52f25387caa8f7a8e7f6b9e0c62c07~../../../Models/Tree.obj: ae1f360ae0f01ec00979b11612351efe

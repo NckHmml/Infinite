@@ -4,6 +4,7 @@ using SiliconStudio.Core.Serialization.Contents;
 using SiliconStudio.Xenko.Engine;
 using SiliconStudio.Xenko.Rendering;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Infinite.Terrain
 {
@@ -45,7 +46,7 @@ namespace Infinite.Terrain
 
         public IEnumerable<Entity> GetSpawns(ContentManager content)
         {
-            var model = content.Load<Model>("Models/Tree");
+            var prefab = content.Load<Prefab>("Models/Tree/Prefab");
 
             foreach (var pair in Entities)
             {
@@ -55,10 +56,10 @@ namespace Infinite.Terrain
                     Y = Position.Y * Size + pair.Key.Y + 1,
                     Z = Position.Z * Size + pair.Key.Z + .5f,
                 };
-
-                var tree = new Entity(position);
-                var modelComponent = new ModelComponent(model);
-                tree.Add(modelComponent);
+                
+                Entity tree = prefab.Instantiate().First();
+                tree.Transform.Position = position;
+                tree.Transform.Rotation = Quaternion.RotationY(pair.Value.Rotation);
 
                 yield return tree;
             }

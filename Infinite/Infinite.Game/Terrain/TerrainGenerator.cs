@@ -16,7 +16,8 @@ namespace Infinite.Terrain
         private static INoise CaveNoise1 { get; } = new SeededNoise(seed, 15);
         private static INoise CaveNoise2 { get; } = new Noise(15);
         private static INoise CaveNoise3 { get; } = new SeededNoise(seed, 250);
-        private static INoise TreeNoise { get; } = new SeededNoise(seed, 5);
+        private static INoise TreeNoise1 { get; } = new SeededNoise(seed, 50);
+        private static INoise TreeNoise2 { get; } = new SeededNoise(seed, 5);
 
         public static Chunk GenerateChunk(GenericVector3<int> chunkPosition)
         {
@@ -55,24 +56,27 @@ namespace Infinite.Terrain
                     return (int)(1 + noise * maxHeight);
                 });
 
-                // Generate the tree map
+
+                // Generate the tree maps
                 treeMap.Fill((x, z) =>
                 {
-                    if (x < 0 || z < 0)
+                    // No tree checking around chunk borders
+                    if (x < 0 || z < 0 || x >= Chunk.Size || z >= Chunk.Size)
                         return false;
+
                     maxY = heightMap[x, z];
                     if (maxY == 1)
                         return false;
-
                     // Variables for readabilty 
                     cX = chunkPosition.X * Chunk.Size + x;
                     cZ = chunkPosition.Z * Chunk.Size + z;
 
-                    noise = TreeNoise.Generate(x, z);
+                    noise = TreeNoise2.Generate(cX, cZ);
                     noise = Math.Round(noise, 1);
-                    return noise == 1 || noise == 0;
+                    return noise == 1;
                 });
 
+                // Combine nearby possibilities to a single spawn point
                 for (int x = 0; x < Chunk.Size; x++)
                 {
                     for (int z = 0; z < Chunk.Size; z++)
@@ -101,8 +105,8 @@ namespace Infinite.Terrain
                             foreach (Vector2 vector in vectors)
                                 treeMap[x - (int)vector.X, z - (int)vector.Y] = false;
 
-                            Vector2 sum = vectors.Aggregate((a, b) => a + b) / vectors.Count;
-                            treeMap[x - (int)Math.Round(sum.X), z - (int)Math.Round(sum.Y)] = true;
+                            Vector2 average = vectors.Aggregate((a, b) => a + b) / vectors.Count;
+                            treeMap[x - (int)Math.Round(average.X), z - (int)Math.Round(average.Y)] = true;
                         }
                     }
                 }
@@ -176,7 +180,17 @@ namespace Infinite.Terrain
                                     AddSide(blocks, position, Block.Adjecent.Front);
 
                                 if (treeMap[x, z])
-                                    entities.Add(position, new EntitySpawn() { Type = EntitySpawn.EntityType.Tree });
+                                {
+                                    cX = chunkPosition.X * Chunk.Size + x;
+                                    cZ = chunkPosition.Z * Chunk.Size + z;
+
+                                    // ToDo: check if there aren't trees nearby?
+                                    entities.Add(position, new EntitySpawn()
+                                    {
+                                        Rotation = (float)TreeNoise1.Generate(cX, cZ) * MathUtil.PiOverTwo,
+                                        Type = EntitySpawn.EntityType.Tree
+                                    });
+                                }
                             }
                         }
 
