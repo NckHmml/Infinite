@@ -36,6 +36,7 @@ namespace Infinite.Terrain
             const int max = 3;
             const int min = -3;
             long cX, cY, cZ;
+            Block? block;
             for (int x = min; x < max; x++)
             {
                 for (int y = min; y < max; y++)
@@ -45,7 +46,8 @@ namespace Infinite.Terrain
                         cX = (long)position.X + x;
                         cY = (long)position.Y + y;
                         cZ = (long)position.Z + z;
-                        if (World.HasBlock(cX, cY, cZ))
+                        block = World.GetBlock(cX, cY, cZ);
+                        if (block.HasValue && block?.Material != Block.MaterialType.Water)
                         {
                             yield return new BoxColliderShape(false, Vector3.One)
                             {

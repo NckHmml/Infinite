@@ -6,13 +6,13 @@ namespace Infinite.Terrain
     {
         public Vector3 Position { get; private set; }
         public Sides Side { get; private set; }
-        public TerrainTexture Texture { get; private set; }
+        public Block.MaterialType Material { get; private set; }
 
-        public TerrainPlane(Vector3 position, Sides side, TerrainTexture texture)
+        public TerrainPlane(Vector3 position, Sides side, Block.MaterialType material)
         {
             Position = position;
             Side = side;
-            Texture = texture;
+            Material = material;
         }
 
         public enum Sides

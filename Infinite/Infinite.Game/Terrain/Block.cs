@@ -18,6 +18,7 @@ namespace Infinite.Terrain
             Soil,
             Grass,
             Stone,
+            Water,
             None = Byte.MaxValue
         }
 

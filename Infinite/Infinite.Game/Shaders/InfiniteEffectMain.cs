@@ -16,10 +16,6 @@ using Buffer = SiliconStudio.Xenko.Graphics.Buffer;
 
 namespace Infinite.Shaders
 {
-    [DataContract]public partial class GameParameters : ShaderMixinParameters
-    {
-        public static readonly PermutationParameterKey<bool> EnableColorEffect = ParameterKeys.NewPermutation<bool>(false);
-    };
     internal static partial class ShaderMixins
     {
         internal partial class InfiniteEffectMain  : IShaderMixinBuilder
@@ -27,8 +23,6 @@ namespace Infinite.Shaders
             public void Generate(ShaderMixinSource mixin, ShaderMixinContext context)
             {
                 context.Mixin(mixin, "XenkoForwardShadingEffect");
-                if (context.GetParam(GameParameters.EnableColorEffect))
-                    context.Mixin(mixin, "SimpleColorEffect");
             }
 
             [ModuleInitializer]

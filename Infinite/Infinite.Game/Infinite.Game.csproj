@@ -110,16 +110,11 @@
       <Generator>XenkoShaderKeyGenerator</Generator>
       <LastGenOutput>InfiniteEffectMain.cs</LastGenOutput>
     </None>
-    <None Include="Shaders\SimpleColorEffect.xksl">
-      <Generator>XenkoShaderKeyGenerator</Generator>
-      <LastGenOutput>SimpleColorEffect.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Contracts\BlockContract.cs" />
     <Compile Include="Contracts\ChunkContract.cs" />
     <Compile Include="Contracts\GenericVector3Contract.cs" />
-    <Compile Include="Helpers\ColorHelper.cs" />
     <Compile Include="Mathematics\GenericVector3.cs" />
     <Compile Include="Mathematics\HeightMap.cs" />
     <Compile Include="Mathematics\HeightMap3D.cs" />
@@ -140,12 +135,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>InfiniteEffectMain.xkfx</DependentUpon>
     </Compile>
-    <Compile Include="Shaders\SimpleColorEffect.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>SimpleColorEffect.xksl</DependentUpon>
-    </Compile>
     <Compile Include="Terrain\Block.cs" />
     <Compile Include="Terrain\Chunk.cs" />
     <Compile Include="Terrain\EntitySpawn.cs" />
@@ -153,7 +142,6 @@
     <Compile Include="Terrain\TerrainDrawer.cs" />
     <Compile Include="Terrain\TerrainGenerator.cs" />
     <Compile Include="Terrain\TerrainPlane.cs" />
-    <Compile Include="Terrain\TerrainTexture.cs" />
     <Compile Include="Terrain\TerrainVertex.cs" />
     <Compile Include="World.cs" />
   </ItemGroup>

@@ -2,7 +2,6 @@
 using SiliconStudio.Core.Mathematics;
 using SiliconStudio.Core.Serialization.Contents;
 using SiliconStudio.Xenko.Engine;
-using SiliconStudio.Xenko.Rendering;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -76,31 +75,17 @@ namespace Infinite.Terrain
             };
 
             if ((block.Sides & Block.Adjecent.Top) == Block.Adjecent.Top)
-                yield return new TerrainPlane(position, TerrainPlane.Sides.Top, TextureForMaterial(block.Material));
+                yield return new TerrainPlane(position, TerrainPlane.Sides.Top, block.Material);
             if ((block.Sides & Block.Adjecent.Bottom) == Block.Adjecent.Bottom)
-                yield return new TerrainPlane(position, TerrainPlane.Sides.Bottom, TextureForMaterial(block.Material));
+                yield return new TerrainPlane(position, TerrainPlane.Sides.Bottom, block.Material);
             if ((block.Sides & Block.Adjecent.Left) == Block.Adjecent.Left)
-                yield return new TerrainPlane(position, TerrainPlane.Sides.Left, TextureForMaterial(block.Material));
+                yield return new TerrainPlane(position, TerrainPlane.Sides.Left, block.Material);
             if ((block.Sides & Block.Adjecent.Right) == Block.Adjecent.Right)
-                yield return new TerrainPlane(position, TerrainPlane.Sides.Right, TextureForMaterial(block.Material));
+                yield return new TerrainPlane(position, TerrainPlane.Sides.Right, block.Material);
             if ((block.Sides & Block.Adjecent.Front) == Block.Adjecent.Front)
-                yield return new TerrainPlane(position, TerrainPlane.Sides.Front, TextureForMaterial(block.Material));
+                yield return new TerrainPlane(position, TerrainPlane.Sides.Front, block.Material);
             if ((block.Sides & Block.Adjecent.Back) == Block.Adjecent.Back)
-                yield return new TerrainPlane(position, TerrainPlane.Sides.Back, TextureForMaterial(block.Material));
-        }
-
-        private TerrainTexture TextureForMaterial(Block.MaterialType material)
-        {
-            switch (material)
-            {
-                case Block.MaterialType.Soil:
-                    return TerrainTexture.Soil;
-                case Block.MaterialType.Grass:
-                    return TerrainTexture.Grass;
-                case Block.MaterialType.Stone:
-                    return TerrainTexture.Stone;
-            }
-            return TerrainTexture.Soil;
+                yield return new TerrainPlane(position, TerrainPlane.Sides.Back, block.Material);
         }
 
         public static Chunk Load(GenericVector3<int> position)

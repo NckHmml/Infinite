@@ -1,9 +1,9 @@
-﻿using Infinite.Shaders;
-using SiliconStudio.Core.Mathematics;
+﻿using SiliconStudio.Core.Mathematics;
 using SiliconStudio.Xenko.Engine;
 using SiliconStudio.Xenko.Graphics;
-using SiliconStudio.Xenko.Physics;
 using SiliconStudio.Xenko.Rendering;
+using SiliconStudio.Xenko.Rendering.Materials;
+using SiliconStudio.Xenko.Rendering.Materials.ComputeColors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +24,6 @@ namespace Infinite.Terrain
         private Object PlaneLock = new Object();
 
         private Buffer Indices;
-        private MutablePipelineState PipelineState;
         private GraphicsContext Context;
 
         public TerrainDrawer(GraphicsContext context)
@@ -35,11 +34,6 @@ namespace Infinite.Terrain
         public void Initialize(IEnumerable<TerrainPlane> planes = null)
         {
             GraphicsDevice device = Context.CommandList.GraphicsDevice;
-
-            PipelineState = new MutablePipelineState(device);
-            PipelineState.State.InputElements = TerrainVertex.Layout.CreateInputElements();
-            PipelineState.State.SetDefaults();
-            PipelineState.State.PrimitiveType = PrimitiveType.TriangleList;
 
             int count = planes?.Count() ?? 0;
             count = count - count % PlaneStep;
@@ -52,10 +46,9 @@ namespace Infinite.Terrain
         {
             lock (PlaneLock)
             {
-                TerrainTexture key = plane.Texture;
                 EnsureCapacity();
                 SetVertices(plane, PlaneMap.Count);
-                                
+
                 PlaneMap.Add(PlaneCount);
                 Planes.Add(PlaneCount, plane);
 
@@ -66,6 +59,19 @@ namespace Infinite.Terrain
         public Entity CreateEntity()
         {
             var model = new Model();
+            var material = Material.New(Context.CommandList.GraphicsDevice, new MaterialDescriptor
+            {
+                Attributes =
+                {
+                    DiffuseModel = new MaterialDiffuseLambertModelFeature(),
+                    Diffuse = new MaterialDiffuseMapFeature(new ComputeShaderClassColor
+                        {
+                            MixinReference = "ComputeColorStream"
+                        })
+                },
+            });
+            model.Materials.Add(material);
+
             model.Add(new Mesh
             {
                 Draw = new MeshDraw
@@ -73,10 +79,9 @@ namespace Infinite.Terrain
                     PrimitiveType = PrimitiveType.TriangleList,
                     VertexBuffers = new[] { VertexBuffer.Value },
                     IndexBuffer = new IndexBufferBinding(Indices, true, Indices.ElementCount),
-                    DrawCount = PlaneMap.Count * 6
+                    DrawCount = PlaneMap.Count * 6,
                 },
             });
-            model.Meshes[0].Parameters.Set(GameParameters.EnableColorEffect, true);
 
             var entity = new Entity();
             entity.Add(new ModelComponent(model));
@@ -93,7 +98,7 @@ namespace Infinite.Terrain
                     Planes.Add(PlaneCount, plane);
                     PlaneCount++;
                 }
-                
+
                 int index = 0;
                 int count = PlaneMap.Count;
                 count = count - count % PlaneStep;
@@ -129,7 +134,7 @@ namespace Infinite.Terrain
 
         private unsafe void SetVertices(TerrainPlane plane, int offset)
         {
-            TerrainTexture key = plane.Texture;
+            Block.MaterialType material = plane.Material;
             Buffer vertices = VertexBuffer?.Buffer;
 
             MappedResource map = Context.CommandList.MapSubresource(vertices, 0, MapMode.WriteNoOverwrite);
@@ -165,10 +170,10 @@ namespace Infinite.Terrain
                     cornerBtmRight = plane.Position + corner4;
                     normal = Vector3.UnitY;
 
-                    pointer[0] = new TerrainVertex(cornerTopRight, normal, key);
-                    pointer[1] = new TerrainVertex(cornerTopLeft, normal, key);
-                    pointer[2] = new TerrainVertex(cornerBtmLeft, normal, key);
-                    pointer[3] = new TerrainVertex(cornerBtmRight, normal, key);
+                    pointer[0] = new TerrainVertex(cornerTopRight, normal, material);
+                    pointer[1] = new TerrainVertex(cornerTopLeft, normal, material);
+                    pointer[2] = new TerrainVertex(cornerBtmLeft, normal, material);
+                    pointer[3] = new TerrainVertex(cornerBtmRight, normal, material);
                     break;
                 case TerrainPlane.Sides.Bottom:
                     cornerTopLeft = plane.Position + corner5;
@@ -177,10 +182,10 @@ namespace Infinite.Terrain
                     cornerBtmRight = plane.Position + corner8;
                     normal = -Vector3.UnitY;
 
-                    pointer[0] = new TerrainVertex(cornerBtmLeft, normal, key);
-                    pointer[1] = new TerrainVertex(cornerTopLeft, normal, key);
-                    pointer[2] = new TerrainVertex(cornerTopRight, normal, key);
-                    pointer[3] = new TerrainVertex(cornerBtmRight, normal, key);
+                    pointer[0] = new TerrainVertex(cornerBtmLeft, normal, material);
+                    pointer[1] = new TerrainVertex(cornerTopLeft, normal, material);
+                    pointer[2] = new TerrainVertex(cornerTopRight, normal, material);
+                    pointer[3] = new TerrainVertex(cornerBtmRight, normal, material);
                     break;
                 case TerrainPlane.Sides.Front:
                     cornerTopLeft = plane.Position + corner3;
@@ -189,10 +194,10 @@ namespace Infinite.Terrain
                     cornerBtmRight = plane.Position + corner5;
                     normal = Vector3.UnitZ;
 
-                    pointer[0] = new TerrainVertex(cornerTopRight, normal, key);
-                    pointer[1] = new TerrainVertex(cornerTopLeft, normal, key);
-                    pointer[2] = new TerrainVertex(cornerBtmLeft, normal, key);
-                    pointer[3] = new TerrainVertex(cornerBtmRight, normal, key);
+                    pointer[0] = new TerrainVertex(cornerTopRight, normal, material);
+                    pointer[1] = new TerrainVertex(cornerTopLeft, normal, material);
+                    pointer[2] = new TerrainVertex(cornerBtmLeft, normal, material);
+                    pointer[3] = new TerrainVertex(cornerBtmRight, normal, material);
                     break;
                 case TerrainPlane.Sides.Back:
                     cornerTopLeft = plane.Position + corner4;
@@ -201,10 +206,10 @@ namespace Infinite.Terrain
                     cornerBtmRight = plane.Position + corner6;
                     normal = -Vector3.UnitZ;
 
-                    pointer[0] = new TerrainVertex(cornerBtmLeft, normal, key);
-                    pointer[1] = new TerrainVertex(cornerTopLeft, normal, key);
-                    pointer[2] = new TerrainVertex(cornerTopRight, normal, key);
-                    pointer[3] = new TerrainVertex(cornerBtmRight, normal, key);
+                    pointer[0] = new TerrainVertex(cornerBtmLeft, normal, material);
+                    pointer[1] = new TerrainVertex(cornerTopLeft, normal, material);
+                    pointer[2] = new TerrainVertex(cornerTopRight, normal, material);
+                    pointer[3] = new TerrainVertex(cornerBtmRight, normal, material);
                     break;
                 case TerrainPlane.Sides.Left:
                     cornerTopLeft = plane.Position + corner1;
@@ -213,10 +218,10 @@ namespace Infinite.Terrain
                     cornerBtmRight = plane.Position + corner6;
                     normal = Vector3.UnitX;
 
-                    pointer[0] = new TerrainVertex(cornerTopRight, normal, key);
-                    pointer[1] = new TerrainVertex(cornerTopLeft, normal, key);
-                    pointer[2] = new TerrainVertex(cornerBtmLeft, normal, key);
-                    pointer[3] = new TerrainVertex(cornerBtmRight, normal, key);
+                    pointer[0] = new TerrainVertex(cornerTopRight, normal, material);
+                    pointer[1] = new TerrainVertex(cornerTopLeft, normal, material);
+                    pointer[2] = new TerrainVertex(cornerBtmLeft, normal, material);
+                    pointer[3] = new TerrainVertex(cornerBtmRight, normal, material);
                     break;
                 case TerrainPlane.Sides.Right:
                     cornerTopLeft = plane.Position + corner3;
@@ -225,10 +230,10 @@ namespace Infinite.Terrain
                     cornerBtmRight = plane.Position + corner8;
                     normal = -Vector3.UnitX;
 
-                    pointer[0] = new TerrainVertex(cornerBtmLeft, normal, key);
-                    pointer[1] = new TerrainVertex(cornerTopLeft, normal, key);
-                    pointer[2] = new TerrainVertex(cornerTopRight, normal, key);
-                    pointer[3] = new TerrainVertex(cornerBtmRight, normal, key);
+                    pointer[0] = new TerrainVertex(cornerBtmLeft, normal, material);
+                    pointer[1] = new TerrainVertex(cornerTopLeft, normal, material);
+                    pointer[2] = new TerrainVertex(cornerTopRight, normal, material);
+                    pointer[3] = new TerrainVertex(cornerBtmRight, normal, material);
                     break;
             }
 

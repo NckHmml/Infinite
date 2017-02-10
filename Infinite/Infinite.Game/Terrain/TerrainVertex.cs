@@ -1,15 +1,15 @@
-﻿using Infinite.Helpers;
-using SiliconStudio.Core.Mathematics;
+﻿using SiliconStudio.Core.Mathematics;
 using SiliconStudio.Xenko.Graphics;
 using System;
 using System.Runtime.InteropServices;
+using Colors = SiliconStudio.Core.Mathematics.Color;
 
 namespace Infinite.Terrain
 {
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     public struct TerrainVertex : IEquatable<TerrainVertex>, IVertex
     {
-        public TerrainVertex(Vector3 position, Vector3 normal, TerrainTexture texture) : this()
+        public TerrainVertex(Vector3 position, Vector3 normal, Block.MaterialType texture) : this()
         {
             Position = position;
             Normal = normal;
@@ -29,7 +29,7 @@ namespace Infinite.Terrain
         /// <summary>
         /// The color.
         /// </summary>
-        public Color Color;
+        public Vector4 Color;
 
         /// <summary>
         /// Defines structure byte size.
@@ -42,24 +42,27 @@ namespace Infinite.Terrain
         public static readonly VertexDeclaration Layout = new VertexDeclaration(
             VertexElement.Position<Vector3>(),
             VertexElement.Normal<Vector3>(),
-            VertexElement.Color<Color>()
+            VertexElement.Color<Vector4>()
         );
 
-        private Color GetColorFor(TerrainTexture texture, Vector3 position)
+        private Vector4 GetColorFor(Block.MaterialType material, Vector3 position)
         {
             float blend;
-            switch (texture)
+            switch (material)
             {
-                case TerrainTexture.Grass:
+                case Block.MaterialType.Grass:
                     blend = Math.Min(1f, Math.Max(0.5f, position.Y / 50f) - 0.5f);
-                    return Color.Green.Blend(new Color(blend));
-                case TerrainTexture.Soil:
-                    return Color.SandyBrown;
-                case TerrainTexture.Stone:
+                    return Vector4.Lerp(Colors.Green.ToVector4(), Vector4.One, blend);
+                case Block.MaterialType.Soil:
+                    return Colors.SandyBrown.ToVector4();
+                case Block.MaterialType.Water:
+                    return new Vector4(0, 0, 1f, .5f);
+                case Block.MaterialType.Stone:
                 default:
                     blend = -128 - position.Y;
                     blend = 1f - Math.Min(1f, Math.Max(0f, blend / -128f));
-                    return Color.Black.Blend(new Color(blend / 6, 0, 0));
+                    blend /= 30f;
+                    return Vector4.Lerp(new Vector4(0.04f, 0.04f, 0.04f, 1f), Colors.Red.ToVector4(), blend);
             }
         }
 

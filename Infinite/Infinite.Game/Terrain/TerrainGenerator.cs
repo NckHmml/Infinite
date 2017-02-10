@@ -47,7 +47,7 @@ namespace Infinite.Terrain
 
                     noise = .93 * HeightNoise1.Generate(cX, cZ);
                     noise += .07 * HeightNoise2.Generate(cX, cZ);
-                    
+
                     // Flatten valley
                     noise -= valleyGap;
                     noise *= 1 / (1 - valleyGap);
@@ -165,7 +165,17 @@ namespace Infinite.Terrain
                             {
                                 var position = new GenericVector3<byte>((byte)x, (byte)iY, (byte)z);
 
-                                AddSide(blocks, position, GetSides(position, heightMap, chunkBottom, Block.Adjecent.Top), maxY == 1 ? Block.MaterialType.Soil : Block.MaterialType.Grass);
+                                if (maxY == 1)
+                                {
+                                    AddSide(blocks, position, GetSides(position, heightMap, chunkBottom, Block.Adjecent.Top), Block.MaterialType.Soil);
+                                    // ToDo: Figure out why alpha channels don't blend
+                                    var above = new GenericVector3<byte>((byte)x, (byte)(iY + 1), (byte)z);
+                                    AddSide(blocks, above, Block.Adjecent.Top, Block.MaterialType.Water);
+                                }
+                                else
+                                {
+                                    AddSide(blocks, position, GetSides(position, heightMap, chunkBottom, Block.Adjecent.Top), Block.MaterialType.Grass);
+                                }
                                 if (caveMap[x - 1, iY, z])
                                     AddSide(blocks, position, Block.Adjecent.Left);
                                 if (caveMap[x + 1, iY, z])

@@ -36,7 +36,7 @@ namespace Infinite.Rendering
                         continue;
 
                     // Generate shader permuatations
-                    renderEffect.EffectValidator.ValidateParameter(GameParameters.EnableColorEffect, renderMesh.Mesh.Parameters.Get(GameParameters.EnableColorEffect));
+                    //renderEffect.EffectValidator.ValidateParameter(GameParameters.EnableColorEffect, renderMesh.Mesh.Parameters.Get(GameParameters.EnableColorEffect));
                 }
             }
         }
